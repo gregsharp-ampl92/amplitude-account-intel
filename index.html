@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amplitude Account Intel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{--amp-blue:#0052F2;--amp-dark:#001A4F;--amp-lilac:#6980FF;--amp-violet:#A373FF;--amp-pink:#FF7D78;--bg:#F5F4F0;--surface:#FFFFFF;--surface-2:#F0EEE9;--border:rgba(0,26,79,0.1);--text:#0A0A14;--text-muted:#6B6B7E;--text-faint:#A8A8B8;--radius:14px;--radius-sm:8px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+  .app-header{background:var(--amp-dark);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;letter-spacing:-.02em}.logo span{color:var(--amp-lilac)}
+  .header-badge{font-size:11px;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase}
+  .main{max-width:1100px;margin:0 auto;padding:40px 24px 80px}
+  .search-section{background:var(--surface);border-radius:var(--radius);padding:36px 40px;border:1px solid var(--border);margin-bottom:32px;position:relative;overflow:hidden}
+  .search-section::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(105,128,255,.12) 0%,transparent 70%);pointer-events:none}
+  .search-eyebrow{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--amp-blue);margin-bottom:8px}
+  .search-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--amp-dark);margin-bottom:6px;letter-spacing:-.03em;line-height:1.2}
+  .search-sub{font-size:14px;color:var(--text-muted);margin-bottom:28px;max-width:560px}
+  .search-row{display:flex;gap:12px;align-items:stretch}
+  .search-input-wrap{flex:1;position:relative}
+  .search-input{width:100%;height:52px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0 20px 0 48px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);background:var(--bg);outline:none;transition:border-color .2s,box-shadow .2s}
+  .search-input:focus{border-color:var(--amp-blue);box-shadow:0 0 0 3px rgba(0,82,242,.1);background:#fff}
+  .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:18px;pointer-events:none}
+  .search-btn{height:52px;padding:0 28px;background:var(--amp-blue);color:white;border:none;border-radius:var(--radius-sm);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .2s,transform .1s;white-space:nowrap;display:flex;align-items:center;gap:8px}
+  .search-btn:hover{background:#003FCC}.search-btn:active{transform:scale(.98)}.search-btn:disabled{background:var(--text-faint);cursor:not-allowed}
+  .quick-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .chip{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);cursor:pointer;transition:all .15s}
+  .chip:hover{border-color:var(--amp-blue);color:var(--amp-blue);background:rgba(0,82,242,.04)}
+  .progress-section{background:var(--surface);border-radius:var(--radius);padding:32px 40px;border:1px solid var(--border);margin-bottom:32px;display:none}
+  .progress-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--amp-dark);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+  .spinner{width:18px;height:18px;border:2px solid rgba(0,82,242,.2);border-top-color:var(--amp-blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .steps{display:flex;flex-direction:column;gap:10px}
+  .step{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-muted)}
+  .step.active{color:var(--amp-blue);font-weight:500}.step.done{color:#16a34a}
+  .step-dot{width:8px;height:8px;border-radius:50%;background:var(--text-faint);flex-shrink:0}
+  .step.active .step-dot{background:var(--amp-blue)}.step.done .step-dot{background:#16a34a}
+  .results-section{display:none}
+  .result-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+  .company-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--amp-dark);letter-spacing:-.03em}
+  .company-meta{font-size:13px;color:var(--text-muted);margin-top:4px}
+  .reset-btn{padding:10px 20px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;color:var(--text-muted);transition:all .15s;white-space:nowrap}
+  .reset-btn:hover{border-color:var(--amp-blue);color:var(--amp-blue)}
+  .tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:28px;overflow-x:auto}
+  .tab{padding:10px 20px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1.5px;white-space:nowrap;transition:all .15s;position:relative}
+  .tab:hover{color:var(--amp-blue)}.tab.active{color:var(--amp-blue);border-bottom-color:var(--amp-blue)}
+  .warm-dot{display:inline-block;width:7px;height:7px;background:var(--amp-pink);border-radius:50%;margin-left:5px;vertical-align:middle;position:relative;top:-1px}
+  .tab-content{display:none}.tab-content.active{display:block}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:20px}
+  .card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:16px}
+  .card-body{font-size:14px;color:var(--text);line-height:1.7}
+  .card-body p{margin-bottom:12px}.card-body p:last-child{margin-bottom:0}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+  .stat-card{background:var(--surface-2);border-radius:var(--radius-sm);padding:16px 20px}
+  .stat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--amp-blue);letter-spacing:-.02em}
+  .stat-label{font-size:11px;color:var(--text-muted);margin-top:2px}
+  .tech-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .tech-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid}
+  .tech-pill.analytics{background:rgba(0,82,242,.06);border-color:rgba(0,82,242,.2);color:#0052F2}
+  .tech-pill.data{background:rgba(163,115,255,.06);border-color:rgba(163,115,255,.2);color:#6B34CC}
+  .tech-pill.cloud{background:rgba(255,125,120,.06);border-color:rgba(255,125,120,.2);color:#CC3B35}
+  .tech-pill.ml{background:rgba(22,163,74,.06);border-color:rgba(22,163,74,.2);color:#15803D}
+  .tech-pill.observability{background:rgba(234,88,12,.06);border-color:rgba(234,88,12,.2);color:#C2410C}
+  .persona-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+  .persona-header{padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;background:var(--surface-2)}
+  .persona-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;flex-shrink:0}
+  .avatar-blue{background:rgba(0,82,242,.12);color:var(--amp-blue)}
+  .avatar-violet{background:rgba(163,115,255,.12);color:#7C3AED}
+  .avatar-teal{background:rgba(20,184,166,.12);color:#0F766E}
+  .persona-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--amp-dark)}
+  .persona-role{font-size:12px;color:var(--text-muted);margin-top:2px}
+  .persona-badge{margin-left:auto;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em}
+  .badge-champion{background:rgba(0,82,242,.1);color:var(--amp-blue)}
+  .badge-economic{background:rgba(22,163,74,.1);color:#15803D}
+  .persona-body{padding:24px 28px}
+  .outreach-tabs{display:flex;gap:6px;margin-bottom:16px}
+  .otab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);color:var(--text-muted);transition:all .15s}
+  .otab.active{background:var(--amp-dark);color:white;border-color:var(--amp-dark)}
+  .msg-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px 24px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap;display:none;position:relative}
+  .msg-box.active{display:block}
+  .msg-subject{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+  .copy-btn{position:absolute;top:12px;right:12px;padding:5px 12px;font-size:11px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;color:var(--text-muted);transition:all .15s}
+  .copy-btn:hover{border-color:var(--amp-blue);color:var(--amp-blue)}.copy-btn.copied{color:#16a34a;border-color:#16a34a}
+  .pain-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  .pain-box{background:var(--surface-2);border-radius:var(--radius-sm);padding:14px 18px}
+  .pain-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:6px}
+  .pain-text{font-size:13px;color:var(--text);line-height:1.5}
+  .strategy-block{border-left:3px solid var(--amp-blue);padding-left:20px;margin-bottom:20px}
+  .strategy-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amp-blue);margin-bottom:6px}
+  .strategy-text{font-size:14px;color:var(--text);line-height:1.65}
+  .comp-table{width:100%;border-collapse:collapse;font-size:13px}
+  .comp-table th{text-align:left;padding:10px 16px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);border-bottom:1px solid var(--border)}
+  .comp-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+  .comp-table tr:last-child td{border-bottom:none}
+  .comp-name{font-weight:500;color:var(--amp-dark)}
+  .comp-threat{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:500}
+  .threat-high{background:rgba(220,38,38,.08);color:#DC2626}.threat-med{background:rgba(234,88,12,.08);color:#EA580C}
+  .win-text{color:var(--text-muted);font-size:12px;line-height:1.5}
+  .sequence{display:flex;flex-direction:column;gap:0}
+  .seq-item{display:flex;gap:20px;padding-bottom:24px;position:relative}
+  .seq-item:not(:last-child)::before{content:'';position:absolute;left:15px;top:32px;bottom:0;width:1px;background:var(--border)}
+  .seq-num{width:32px;height:32px;border-radius:50%;background:var(--amp-dark);color:white;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1}
+  .seq-content{flex:1;padding-top:4px}
+  .seq-day{font-size:11px;font-weight:600;color:var(--amp-blue);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+  .seq-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--amp-dark);margin-bottom:6px}
+  .seq-desc{font-size:13px;color:var(--text-muted);line-height:1.55}
+  .error-msg{background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius-sm);padding:16px 20px;font-size:13px;color:#DC2626;margin-top:16px;display:none}
+
+  /* WARM PATHS */
+  .warm-hero{background:var(--amp-dark);border-radius:var(--radius);padding:28px 32px;margin-bottom:24px;color:white;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .warm-hero h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+  .warm-hero p{font-size:13px;opacity:.7;max-width:460px;line-height:1.55}
+  .warm-stats{display:flex;gap:28px}
+  .warm-stat-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--amp-lilac)}
+  .warm-stat-label{font-size:11px;opacity:.6;margin-top:2px}
+  .warm-loading{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);padding:24px 0}
+  .warm-spinner{width:16px;height:16px;border:2px solid rgba(0,82,242,.15);border-top-color:var(--amp-blue);border-radius:50%;animation:spin .7s linear infinite}
+  .section-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .section-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--amp-dark)}
+  .section-count{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--surface-2);color:var(--text-muted)}
+  .section-desc{font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.55;max-width:680px}
+  .warm-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+  .warm-card-header{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+  .warm-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex-shrink:0}
+  .av-purple{background:rgba(163,115,255,.15);color:#7C3AED}
+  .av-coral{background:rgba(255,125,120,.15);color:#CC3B35}
+  .person-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--amp-dark)}
+  .person-role{font-size:12px;color:var(--text-muted);margin-top:1px}
+  .type-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;margin-left:auto;flex-shrink:0}
+  .badge-alumni{background:rgba(163,115,255,.12);color:#6B34CC}
+  .badge-connector{background:rgba(255,125,120,.12);color:#CC3B35}
+  .warm-card-body{padding:16px 20px}
+  .conn-row{display:flex;gap:12px;margin-bottom:8px;font-size:13px}
+  .conn-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);min-width:88px;flex-shrink:0;padding-top:2px}
+  .conn-val{color:var(--text);line-height:1.5}
+  .warm-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .warm-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .15s;font-family:'DM Sans',sans-serif;text-decoration:none}
+  .warm-btn:hover{border-color:var(--amp-blue);color:var(--amp-blue)}
+  .warm-btn.primary{background:var(--amp-dark);color:white;border-color:var(--amp-dark)}.warm-btn.primary:hover{background:#0A2980}
+  .note-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap;margin-top:12px;position:relative;display:none}
+  .note-box.show{display:block}
+  .warm-divider{border:none;border-top:1.5px solid var(--border);margin:28px 0}
+  .empty-state{background:var(--surface-2);border-radius:var(--radius-sm);padding:20px 24px;font-size:13px;color:var(--text-muted);text-align:center}
+
+  @media(max-width:640px){
+    .main{padding:24px 16px 60px}.search-section{padding:24px 20px}
+    .card{padding:20px}.pain-grid{grid-template-columns:1fr}
+    .search-row{flex-direction:column}.warm-hero{flex-direction:column}.warm-stats{gap:16px}
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">Amplitude <span>·</span> Account Intel</div>
+  <div class="header-badge">AI-Powered GTM</div>
+</header>
+
+<main class="main">
+
+  <div class="search-section" id="searchSection">
+    <div class="search-eyebrow">Strategic Account Intelligence</div>
+    <h1 class="search-title">Turn any account into<br>a ready-to-send outreach plan</h1>
+    <p class="search-sub">Enter a company name to pull growth strategy, AI initiatives, tech stack, warm alumni paths, and personalized messaging for every key persona — all in under 30 seconds.</p>
+    <div class="search-row">
+      <div class="search-input-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" class="search-input" id="accountInput" placeholder="e.g. Capital One, JPMorgan Chase, Salesforce..." autocomplete="off"/>
+      </div>
+      <button class="search-btn" id="searchBtn" onclick="runIntel()"><span>Generate Intel</span><span>→</span></button>
+    </div>
+    <div class="quick-chips">
+      <span class="chip" onclick="setAccount('Capital One')">Capital One</span>
+      <span class="chip" onclick="setAccount('JPMorgan Chase')">JPMorgan Chase</span>
+      <span class="chip" onclick="setAccount('Spotify')">Spotify</span>
+      <span class="chip" onclick="setAccount('Stripe')">Stripe</span>
+      <span class="chip" onclick="setAccount('DoorDash')">DoorDash</span>
+      <span class="chip" onclick="setAccount('Airbnb')">Airbnb</span>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <div class="progress-section" id="progressSection">
+    <div class="progress-title"><div class="spinner"></div><span id="progressTitle">Researching account…</span></div>
+    <div class="steps" id="stepsList"></div>
+  </div>
+
+  <div class="results-section" id="resultsSection">
+    <div class="result-header">
+      <div><div class="company-title" id="resultCompany"></div><div class="company-meta" id="resultMeta"></div></div>
+      <button class="reset-btn" onclick="reset()">← New Account</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('overview')">Company Overview</div>
+      <div class="tab" onclick="switchTab('techstack')">Tech Stack</div>
+      <div class="tab" onclick="switchTab('outreach')">Outreach Plan</div>
+      <div class="tab" onclick="switchTab('sequence')">Sequence</div>
+      <div class="tab" id="warmTab" onclick="switchTab('warmpaths')">Warm Paths <span class="warm-dot"></span></div>
+      <div class="tab" onclick="switchTab('competitive')">Competitive</div>
+    </div>
+
+    <div class="tab-content active" id="tab-overview">
+      <div class="stat-grid" id="statsGrid"></div>
+      <div class="card"><div class="card-title">Growth Strategy & AI Initiatives</div><div class="card-body" id="growthStrategy"></div></div>
+      <div class="card"><div class="card-title">Amplitude Opportunity</div><div class="card-body" id="ampOpportunity"></div></div>
+    </div>
+
+    <div class="tab-content" id="tab-techstack">
+      <div class="card"><div class="card-title">Analytics & Measurement</div><div class="tech-grid" id="techAnalytics"></div></div>
+      <div class="card"><div class="card-title">Data & ML Infrastructure</div><div class="tech-grid" id="techData"></div></div>
+      <div class="card"><div class="card-title">Cloud & Observability</div><div class="tech-grid" id="techCloud"></div></div>
+      <div class="card"><div class="card-title">Stack Analysis — Where Amplitude Fits</div><div class="card-body" id="stackAnalysis"></div></div>
+    </div>
+
+    <div class="tab-content" id="tab-outreach"><div id="personaCards"></div></div>
+
+    <div class="tab-content" id="tab-sequence">
+      <div class="card"><div class="card-title">Recommended Outreach Sequence</div><div class="sequence" id="sequenceSteps"></div></div>
+      <div class="card"><div class="card-title">Discovery Questions</div><div class="card-body" id="discoveryQuestions"></div></div>
+    </div>
+
+    <!-- WARM PATHS TAB -->
+    <div class="tab-content" id="tab-warmpaths">
+
+      <div class="warm-hero">
+        <div>
+          <h2>Warm Paths into this Account</h2>
+          <p>Amplitude alumni now inside the account, and Amplitude employees who came from there. Warm introductions convert 5–10× better than cold outreach.</p>
+        </div>
+        <div class="warm-stats">
+          <div>
+            <div class="warm-stat-num" id="warmAlumniCount">—</div>
+            <div class="warm-stat-label">Alumni at account</div>
+          </div>
+          <div>
+            <div class="warm-stat-num" id="warmConnCount">—</div>
+            <div class="warm-stat-label">Amp connectors</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="warmLoading" class="warm-loading">
+        <div class="warm-spinner"></div>
+        <span>Scanning alumni and connection signals via web search…</span>
+      </div>
+
+      <div id="warmContent" style="display:none">
+
+        <div class="section-row">
+          <div class="section-title">Amplitude Alumni at this Account</div>
+          <div class="section-count" id="alumniCountLabel">0 found</div>
+        </div>
+        <p class="section-desc">People who previously worked at Amplitude and now hold roles at this account. They know Amplitude's value firsthand and can open doors, validate your pitch, or make direct introductions.</p>
+        <div id="alumniCards"></div>
+
+        <div class="warm-divider"></div>
+
+        <div class="section-row">
+          <div class="section-title">Amplitude Employees with Prior Account Experience</div>
+          <div class="section-count" id="connCountLabel">0 found</div>
+        </div>
+        <p class="section-desc">Current Amplitude employees who worked at this account before joining. They carry insider knowledge of the org culture, key relationships, and decision-making dynamics — ask them for context before you reach out.</p>
+        <div id="connCards"></div>
+
+        <div class="warm-divider"></div>
+
+        <div class="card">
+          <div class="card-title">Warm Path Strategy for this Account</div>
+          <div class="card-body" id="warmStrategyBody"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-competitive">
+      <div class="card">
+        <div class="card-title">Likely Incumbent Tools</div>
+        <table class="comp-table"><thead><tr><th>Tool</th><th>Category</th><th>Threat</th><th>Amplitude Win</th></tr></thead><tbody id="compTableBody"></tbody></table>
+      </div>
+      <div class="card"><div class="card-title">Positioning Strategy for This Account</div><div class="card-body" id="positioningStrategy"></div></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const STEPS=[
+  "Pulling public filings and annual reports…",
+  "Analyzing growth strategy and AI initiatives…",
+  "Mapping technology stack and incumbents…",
+  "Identifying key personas and buying committee…",
+  "Generating personalized outreach messaging…",
+  "Building competitive positioning…",
+  "Scanning alumni and warm connection signals…"
+];
+
+let currentAccount='';
+let intelData=null;
+
+function setAccount(n){document.getElementById('accountInput').value=n;}
+
+function showStep(i){
+  document.querySelectorAll('.step').forEach((el,j)=>{
+    el.className='step'+(j<i?' done':j===i?' active':'');
+  });
+  const t=["Pulling public data…","Analyzing strategy…","Mapping tech stack…","Identifying personas…","Writing messages…","Building competitive analysis…","Finding warm paths…"];
+  document.getElementById('progressTitle').textContent=t[i]||'Finalizing…';
+}
+
+async function runIntel(){
+  const inp=document.getElementById('accountInput').value.trim();
+  if(!inp)return;
+  currentAccount=inp;
+  document.getElementById('searchBtn').disabled=true;
+  document.getElementById('errorMsg').style.display='none';
+  document.getElementById('stepsList').innerHTML=STEPS.map((s,i)=>`<div class="step"><div class="step-dot"></div><span>${s}</span></div>`).join('');
+  document.getElementById('progressSection').style.display='block';
+  document.getElementById('resultsSection').style.display='none';
+  let si=0; showStep(0);
+  const iv=setInterval(()=>{si=Math.min(si+1,STEPS.length-1);showStep(si);},2000);
+
+  try{
+    const sys=`You are an elite B2B sales intelligence analyst for Amplitude — the leading AI analytics platform. Produce deep, actionable account intelligence positioning Amplitude as the essential measurement layer for AI initiatives. Amplitude measures user behavior, product adoption, and business impact of AI features — bridging observability (is AI running?) and BI (what happened?) with behavioral intelligence (why are users doing this and what should we do?). Key differentiators: causal insights engine, behavioral cohort analysis, integrated experimentation, AI Agents (Ask Amplitude), CDP, #1 G2 product analytics. Target personas: CHAMPION (VP/Director Product AI, CPO), ECONOMIC BUYER (CAIO, CDO), INFLUENCE (VP Data Science, VP Eng, Head of Experimentation). Brand voice: provocative, direct, outcomes-first. Respond with ONLY valid JSON, no preamble, no markdown fences.`;
+
+    const usr=`Research ${inp} as a strategic Amplitude target. Return this exact JSON structure:
+{"company":"${inp}","industry":"...","headquarters":"city, state","employees":"...","revenue":"...","aiMaturity":"Experimenting|Scaling|Operationalizing","growthStrategy":"3-4 paragraphs on actual growth strategy and AI investments. Be specific — reference real initiatives.","keyMetrics":[{"label":"Revenue","value":"$X"},{"label":"Employees","value":"Xk"},{"label":"AI Investment","value":"..."},{"label":"Digital Products","value":"..."}],"amplitudeOpportunity":"2-3 paragraphs connecting their AI initiatives to Amplitude's measurement gap. Name specific products/initiatives.","techStack":{"analytics":[{"name":"...","category":"analytics","notes":"..."}],"data":[{"name":"...","category":"data","notes":"..."}],"cloud":[{"name":"...","category":"cloud","notes":"..."}]},"stackAnalysis":"2 paragraphs on stack gaps and where Amplitude fits.","personas":[{"role":"exact VP/Director title","type":"Champion","initials":"XX","avatarClass":"avatar-blue","pain":"specific pain at this company","outcome":"specific Amplitude outcome","emailSubject":"compelling, specific subject","email":"full personalized email — provocative opener tied to their company/role, one sharp insight about their AI measurement gap, clear CTA to book 20-min call. No generic phrases. Reference their actual products.","linkedin":"75-word LinkedIn note, personal and specific, no pitch-slap","hook":"15-word discovery question"},{"role":"exact C-suite title","type":"Economic Buyer","initials":"XX","avatarClass":"avatar-violet","pain":"...","outcome":"...","emailSubject":"...","email":"...","linkedin":"...","hook":"..."},{"role":"exact VP/Director title","type":"Influence","initials":"XX","avatarClass":"avatar-teal","pain":"...","outcome":"...","emailSubject":"...","email":"...","linkedin":"...","hook":"..."}],"sequence":[{"day":"Day 1","channel":"Email","persona":"...","action":"...","note":"..."},{"day":"Day 3","channel":"LinkedIn","persona":"...","action":"...","note":"..."},{"day":"Day 6","channel":"Email","persona":"...","action":"...","note":"..."},{"day":"Day 10","channel":"Phone","persona":"...","action":"...","note":"..."},{"day":"Day 14","channel":"LinkedIn","persona":"...","action":"...","note":"..."},{"day":"Day 18","channel":"Email","persona":"...","action":"...","note":"..."},{"day":"Day 21","channel":"Break-up","persona":"all","action":"Final breakup email","note":"..."}],"discoveryQuestions":"6-8 discovery questions specific to their AI initiatives. Bulleted list.","competitors":[{"name":"...","category":"...","threat":"High","amplitudeWin":"one sharp sentence"},{"name":"...","category":"...","threat":"Medium","amplitudeWin":"..."},{"name":"...","category":"...","threat":"Medium","amplitudeWin":"..."},{"name":"...","category":"...","threat":"Low","amplitudeWin":"..."}],"positioningStrategy":"2-3 paragraphs on specific positioning for this account.","warmStrategy":"3 paragraphs: (1) how to approach alumni at this account for an intro or reference, (2) how to use internal Amplitude connectors for account intelligence before outreaching, (3) how to sequence warm outreach relative to cold outreach for maximum effect at this specific company."}`;
+
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:9000,tools:[{"type":"web_search_20250305","name":"web_search"}],system:sys,messages:[{role:"user",content:usr}]})});
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'API error');}
+    const d=await r.json();
+    let raw='';
+    for(const b of d.content){if(b.type==='text')raw+=b.text;}
+    intelData=JSON.parse(raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());
+    clearInterval(iv); showStep(STEPS.length-1);
+    setTimeout(()=>{renderResults(intelData); loadWarmPaths(inp);},400);
+  }catch(err){
+    clearInterval(iv);
+    document.getElementById('progressSection').style.display='none';
+    document.getElementById('errorMsg').textContent='Error: '+err.message+'. Please try again.';
+    document.getElementById('errorMsg').style.display='block';
+    document.getElementById('searchBtn').disabled=false;
+  }
+}
+
+async function loadWarmPaths(accountName){
+  document.getElementById('warmLoading').style.display='flex';
+  document.getElementById('warmContent').style.display='none';
+
+  try{
+    const prompt=`You are a sales intelligence assistant helping an Amplitude account executive find warm paths into ${accountName}.
+
+Search the web to identify:
+
+1. AMPLITUDE ALUMNI: Real people who previously worked at Amplitude (in any role) and now work at ${accountName} in relevant functions (product, data, analytics, engineering, AI/ML, growth, or leadership). Search LinkedIn, news, and professional profiles.
+
+2. AMPLITUDE CONNECTORS: Real current Amplitude employees who previously worked at ${accountName} before joining Amplitude. These people can provide insider knowledge and may still have relationships at ${accountName}.
+
+For each person, provide their actual name, roles, and a suggested note the AE can use.
+
+If you find specific real people, include them. If you cannot confirm specific individuals, provide 2-3 realistic illustrative examples based on typical career paths between these companies and note they are illustrative.
+
+Return ONLY this JSON structure with no other text:
+{"alumni":[{"name":"Full Name","initials":"XX","currentRole":"their role at ${accountName}","amplitudeRole":"their role when at Amplitude","amplitudeTenure":"e.g. 2019–2022","relevance":"why this warm path is valuable for Amplitude outreach","warmNote":"a 3-sentence outreach message the AE can send to this alumni asking for an intro or reference — specific, not generic","linkedinUrl":"URL or null","isIllustrative":false}],"connectors":[{"name":"Full Name","initials":"XX","amplitudeRole":"their current role at Amplitude","accountRole":"their former role at ${accountName}","accountTenure":"e.g. 2018–2021","relevance":"what insider knowledge they bring and how they can help","askNote":"a 2-sentence Slack or email the AE can send to this Amplitude colleague asking for context or an intro — collegial and specific","linkedinUrl":"URL or null","isIllustrative":false}]}`;
+
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:3000,tools:[{"type":"web_search_20250305","name":"web_search"}],messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();
+    let raw='';
+    for(const b of d.content){if(b.type==='text')raw+=b.text;}
+    const warm=JSON.parse(raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());
+    renderWarmPaths(warm);
+  }catch(e){
+    document.getElementById('warmLoading').style.display='none';
+    document.getElementById('warmContent').style.display='block';
+    document.getElementById('alumniCards').innerHTML='<div class="empty-state">Could not load warm path data automatically. Search ZoomInfo using employment history filters: search contacts who currently work at '+currentAccount+' with past employer = Amplitude.</div>';
+    document.getElementById('connCards').innerHTML='<div class="empty-state">Search Glean or LinkedIn internally for Amplitude employees who previously worked at '+currentAccount+'.</div>';
+    document.getElementById('warmAlumniCount').textContent='?';
+    document.getElementById('warmConnCount').textContent='?';
+    document.getElementById('alumniCountLabel').textContent='search manually';
+    document.getElementById('connCountLabel').textContent='search manually';
+    if(intelData?.warmStrategy) document.getElementById('warmStrategyBody').innerHTML=formatBody(intelData.warmStrategy);
+  }
+}
+
+function renderWarmPaths(warm){
+  document.getElementById('warmLoading').style.display='none';
+  document.getElementById('warmContent').style.display='block';
+
+  const alumni=warm.alumni||[];
+  const conns=warm.connectors||[];
+
+  document.getElementById('warmAlumniCount').textContent=alumni.length;
+  document.getElementById('warmConnCount').textContent=conns.length;
+  document.getElementById('alumniCountLabel').textContent=alumni.length+' found';
+  document.getElementById('connCountLabel').textContent=conns.length+' found';
+
+  function renderCards(list,container,avClass,badgeClass,badgeLabel,noteKey,labelA,labelB,tenureKey){
+    const el=document.getElementById(container);
+    if(!list.length){el.innerHTML='<div class="empty-state">No connections identified. Search ZoomInfo with employment history filters to find these manually.</div>';return;}
+    el.innerHTML=list.map((p,i)=>{
+      const initials=p.initials||(p.name||'??').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+      const illustrative=p.isIllustrative?'<span style="font-size:10px;color:var(--text-faint);margin-left:6px">(illustrative)</span>':'';
+      return `<div class="warm-card">
+        <div class="warm-card-header">
+          <div class="warm-avatar ${avClass}">${initials}</div>
+          <div style="flex:1;min-width:0">
+            <div class="person-name">${p.name}${illustrative}</div>
+            <div class="person-role">${p[labelA]}</div>
+          </div>
+          <span class="type-badge ${badgeClass}">${badgeLabel}</span>
+        </div>
+        <div class="warm-card-body">
+          <div class="conn-row"><div class="conn-label">${labelB}</div><div class="conn-val">${p[labelB.toLowerCase().replace(/\s+/g,'')]||p[tenureKey]||'—'}</div></div>
+          <div class="conn-row"><div class="conn-label">Why valuable</div><div class="conn-val">${p.relevance}</div></div>
+          <div class="warm-actions">
+            <button class="warm-btn primary" onclick="toggleNote('note-${container}-${i}')">View message template</button>
+            ${p.linkedinUrl?`<a href="${p.linkedinUrl}" target="_blank" class="warm-btn">LinkedIn →</a>`:''}
+          </div>
+          <div class="note-box" id="note-${container}-${i}">
+            <button class="copy-btn" onclick="copyNote('note-${container}-${i}',this)">Copy</button>
+${esc(p[noteKey]||'')}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Alumni: currentRole shown, amplitudeRole as context
+  const alumniEl=document.getElementById('alumniCards');
+  if(!alumni.length){alumniEl.innerHTML='<div class="empty-state">No Amplitude alumni identified at this account. In ZoomInfo, search contacts at '+currentAccount+' and filter by past employer = Amplitude.</div>';}
+  else{
+    alumniEl.innerHTML=alumni.map((p,i)=>{
+      const init=(p.initials||(p.name||'??').split(' ').map(n=>n[0]).join('').slice(0,2)).toUpperCase();
+      const ill=p.isIllustrative?'<span style="font-size:10px;color:var(--text-faint);margin-left:6px">(illustrative)</span>':'';
+      return `<div class="warm-card">
+        <div class="warm-card-header">
+          <div class="warm-avatar av-purple">${init}</div>
+          <div style="flex:1;min-width:0">
+            <div class="person-name">${p.name}${ill}</div>
+            <div class="person-role">${p.currentRole} · ${currentAccount}</div>
+          </div>
+          <span class="type-badge badge-alumni">Alumni</span>
+        </div>
+        <div class="warm-card-body">
+          <div class="conn-row"><div class="conn-label">At Amplitude</div><div class="conn-val">${p.amplitudeRole}${p.amplitudeTenure?' · '+p.amplitudeTenure:''}</div></div>
+          <div class="conn-row"><div class="conn-label">Why valuable</div><div class="conn-val">${p.relevance}</div></div>
+          <div class="warm-actions">
+            <button class="warm-btn primary" onclick="toggleNote('anote-${i}')">View outreach note</button>
+            ${p.linkedinUrl?`<a href="${p.linkedinUrl}" target="_blank" class="warm-btn">LinkedIn →</a>`:''}
+          </div>
+          <div class="note-box" id="anote-${i}">
+            <button class="copy-btn" onclick="copyNote('anote-${i}',this)">Copy</button>
+${esc(p.warmNote||'')}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Connectors
+  const connEl=document.getElementById('connCards');
+  if(!conns.length){connEl.innerHTML='<div class="empty-state">No current Amplitude employees with prior experience at this account identified. Search Glean or ask your team internally.</div>';}
+  else{
+    connEl.innerHTML=conns.map((p,i)=>{
+      const init=(p.initials||(p.name||'??').split(' ').map(n=>n[0]).join('').slice(0,2)).toUpperCase();
+      const ill=p.isIllustrative?'<span style="font-size:10px;color:var(--text-faint);margin-left:6px">(illustrative)</span>':'';
+      return `<div class="warm-card">
+        <div class="warm-card-header">
+          <div class="warm-avatar av-coral">${init}</div>
+          <div style="flex:1;min-width:0">
+            <div class="person-name">${p.name}${ill}</div>
+            <div class="person-role">${p.amplitudeRole} · Amplitude</div>
+          </div>
+          <span class="type-badge badge-connector">Connector</span>
+        </div>
+        <div class="warm-card-body">
+          <div class="conn-row"><div class="conn-label">Was at ${currentAccount}</div><div class="conn-val">${p.accountRole}${p.accountTenure?' · '+p.accountTenure:''}</div></div>
+          <div class="conn-row"><div class="conn-label">Their value</div><div class="conn-val">${p.relevance}</div></div>
+          <div class="warm-actions">
+            <button class="warm-btn primary" onclick="toggleNote('cnote-${i}')">View ask template</button>
+            ${p.linkedinUrl?`<a href="${p.linkedinUrl}" target="_blank" class="warm-btn">LinkedIn →</a>`:''}
+          </div>
+          <div class="note-box" id="cnote-${i}">
+            <button class="copy-btn" onclick="copyNote('cnote-${i}',this)">Copy</button>
+${esc(p.askNote||'')}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  if(intelData?.warmStrategy) document.getElementById('warmStrategyBody').innerHTML=formatBody(intelData.warmStrategy);
+}
+
+function toggleNote(id){document.getElementById(id)?.classList.toggle('show');}
+
+function copyNote(id,btn){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const text=el.innerText.replace(/^Copy\n/,'').replace(/^Copy/,'').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);
+  });
+}
+
+function renderResults(intel){
+  document.getElementById('progressSection').style.display='none';
+  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('searchBtn').disabled=false;
+  document.getElementById('resultCompany').textContent=intel.company;
+  document.getElementById('resultMeta').textContent=`${intel.industry} · ${intel.headquarters} · AI Maturity: ${intel.aiMaturity}`;
+  document.getElementById('statsGrid').innerHTML=(intel.keyMetrics||[]).map(m=>`<div class="stat-card"><div class="stat-num">${m.value}</div><div class="stat-label">${m.label}</div></div>`).join('');
+  document.getElementById('growthStrategy').innerHTML=formatBody(intel.growthStrategy);
+  document.getElementById('ampOpportunity').innerHTML=formatBody(intel.amplitudeOpportunity);
+  rTech('techAnalytics',intel.techStack?.analytics||[]);
+  rTech('techData',intel.techStack?.data||[]);
+  rTech('techCloud',intel.techStack?.cloud||[]);
+  document.getElementById('stackAnalysis').innerHTML=formatBody(intel.stackAnalysis);
+  document.getElementById('personaCards').innerHTML=(intel.personas||[]).map((p,i)=>`
+    <div class="persona-card">
+      <div class="persona-header">
+        <div class="persona-avatar ${p.avatarClass}">${p.initials}</div>
+        <div><div class="persona-name">${p.role}</div><div class="persona-role">${intel.company} · ${p.type}</div></div>
+        <span class="persona-badge ${p.type==='Champion'?'badge-champion':'badge-economic'}">${p.type}</span>
+      </div>
+      <div class="persona-body">
+        <div class="pain-grid">
+          <div class="pain-box"><div class="pain-label">Their Pain</div><div class="pain-text">${p.pain}</div></div>
+          <div class="pain-box"><div class="pain-label">Amplitude Outcome</div><div class="pain-text">${p.outcome}</div></div>
+        </div>
+        <div class="strategy-block"><div class="strategy-label">Discovery Hook</div><div class="strategy-text">"${p.hook}"</div></div>
+        <div class="outreach-tabs">
+          <div class="otab active" onclick="switchOTab(this,'em-${i}')">Email</div>
+          <div class="otab" onclick="switchOTab(this,'li-${i}')">LinkedIn</div>
+        </div>
+        <div class="msg-box active" id="em-${i}">
+          <button class="copy-btn" onclick="copyMsg('em-${i}',this)">Copy</button>
+          <div class="msg-subject">Subject: ${p.emailSubject}</div>${esc(p.email)}
+        </div>
+        <div class="msg-box" id="li-${i}">
+          <button class="copy-btn" onclick="copyMsg('li-${i}',this)">Copy</button>${esc(p.linkedin)}
+        </div>
+      </div>
+    </div>`).join('');
+  document.getElementById('sequenceSteps').innerHTML=(intel.sequence||[]).map((s,i)=>`
+    <div class="seq-item">
+      <div class="seq-num">${i+1}</div>
+      <div class="seq-content">
+        <div class="seq-day">${s.day} · ${s.channel}</div>
+        <div class="seq-title">${s.action} — ${s.persona}</div>
+        <div class="seq-desc">${s.note}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('discoveryQuestions').innerHTML=formatBody(intel.discoveryQuestions);
+  document.getElementById('compTableBody').innerHTML=(intel.competitors||[]).map(c=>`
+    <tr>
+      <td class="comp-name">${c.name}</td>
+      <td style="color:var(--text-muted);font-size:12px">${c.category}</td>
+      <td><span class="comp-threat ${c.threat==='High'?'threat-high':'threat-med'}">${c.threat}</span></td>
+      <td class="win-text">${c.amplitudeWin}</td>
+    </tr>`).join('');
+  document.getElementById('positioningStrategy').innerHTML=formatBody(intel.positioningStrategy);
+  switchTab('overview');
+}
+
+function rTech(id,tools){
+  const el=document.getElementById(id);
+  if(!tools.length){el.innerHTML='<span style="font-size:13px;color:var(--text-faint)">None identified</span>';return;}
+  el.innerHTML=tools.map(t=>`<div class="tech-pill ${t.category}" title="${t.notes||''}">${t.name}</div>`).join('');
+}
+
+function formatBody(t){
+  if(!t)return'';
+  return t.split('\n').filter(p=>p.trim()).map(p=>(p.trim().startsWith('•')||p.trim().startsWith('-'))?`<p>• ${p.replace(/^[•\-]\s*/,'')}</p>`:`<p>${p}</p>`).join('');
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function switchTab(name){
+  const names=['overview','techstack','outreach','sequence','warmpaths','competitive'];
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const isWarm=i===4;
+    t.className='tab'+(names[i]===name?' active':'');
+    if(isWarm) t.innerHTML='Warm Paths <span class="warm-dot"></span>';
+  });
+  document.querySelectorAll('.tab-content').forEach(tc=>tc.className='tab-content');
+  const el=document.getElementById('tab-'+name);
+  if(el)el.className='tab-content active';
+}
+
+function switchOTab(btn,tid){
+  const c=btn.closest('.persona-body');
+  c.querySelectorAll('.otab').forEach(t=>t.classList.remove('active'));
+  c.querySelectorAll('.msg-box').forEach(m=>m.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tid)?.classList.add('active');
+}
+
+function copyMsg(id,btn){
+  const b=document.getElementById(id);
+  const t=b.innerText.replace(/^Copy\n/,'').replace(/^Copy/,'').trim();
+  navigator.clipboard.writeText(t).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);
+  });
+}
+
+function reset(){
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('progressSection').style.display='none';
+  document.getElementById('accountInput').value='';
+  document.getElementById('searchBtn').disabled=false;
+  document.getElementById('errorMsg').style.display='none';
+  intelData=null;
+}
+
+document.getElementById('accountInput').addEventListener('keydown',e=>{if(e.key==='Enter')runIntel();});
+</script>
+</body>
+</html>
